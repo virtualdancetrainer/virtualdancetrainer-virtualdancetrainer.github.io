@@ -9,7 +9,7 @@ a {
 	color: #03a9f4;
 }
 #canvas {
-  width: 100%;
+  width: 30%;
   height: auto;
 }
 #video {
@@ -76,7 +76,7 @@ a {
   cursor: pointer;
 }
 .camera {
-  height:  100% !important;
+  height:  50% !important;
 }
 .github-corner {
     position: fixed;
