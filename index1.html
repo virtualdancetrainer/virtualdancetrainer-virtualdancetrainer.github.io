@@ -151,7 +151,7 @@
 				</video></td>
 			<!--container for input-->
 		  <td> <div class="container">
-			<video class="input_video"></video>
+			<video id="video3" class="input_video"></video>
 			<canvas class="output_canvas" width="1280px" height="720px"></canvas>
 			<!-- <canvas class="counter_canvas" width="200px" height="720px"></canvas> -->
 			<div style="display: none;" class="loading">
@@ -167,7 +167,7 @@
 	  </table>
 
 	  <div id="info_debug"></div>
-	  <div id="info_counter"></div>
+	  <div style="display: none;" id="info_counter"></div>
 	</div>
 
 	<div class="scores-container">0000</div>
@@ -187,9 +187,8 @@
 	<!-- Load tracker.js and app.js-->
 	<script src="./js/app.js"></script>
 	<script src="./js/tracker.js"></script>
-	<script src="./js/tracker1.js"></script>
 	<script>
-
+   
 		let source = 'video'; // camera|video|stream		
 		let sourceVideo = '';
 		let defaultVideo = '/videos/1.mp4';
@@ -233,6 +232,8 @@
 
 		// run predictions
 		tracker.run(source);
+
+
 	</script>
 
 <script>
