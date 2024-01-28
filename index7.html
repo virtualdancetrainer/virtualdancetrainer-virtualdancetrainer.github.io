@@ -1,0 +1,121 @@
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    </head>
+
+    <body>
+      
+        <script>
+            // Create a detector.
+
+
+            async function myfunction() {
+ // console.log('Inside of myfunction');
+// Create a detector.
+const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER});
+const video = document.getElementById('video');
+const poses = await detector.estimatePoses(video);
+}
+
+// Here we wait for the myfunction to finish
+// and then returns a promise that'll be waited for aswell
+// It's useless to wait the myfunction to finish before to return
+// we can simply returns a promise that will be resolved later
+
+// Also point that we don't use async keyword on the function because
+// we can simply returns the promise returned by myfunction
+function start() {
+  return myfunction();
+}
+
+// Call start
+(async() => {
+  console.log('before start');
+
+  await start();
+  
+  console.log('after start');
+})();
+        </script>
+          <video id="video" width="100%" height="100%" autoplay></video>
+
+          <a href="#!" class="btn btn-success" onClick="start()">Start Cam</a>
+          <script>
+            var imageScaleFactor = 0.5;
+            var outputStride = 16;
+            var flipHorizontal = false;
+        
+            var imageElement = document.getElementById('video');
+        
+            posenet.load().then(function(net){
+              return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
+            }).then(function(pose){
+              console.log(pose);
+            })
+          </script>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    
+        <!-- Load three.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+        <!-- Load scatter-gl.js -->
+        <script src="https://cdn.jsdelivr.net/npm/scatter-gl@0.0.13/lib/scatter-gl.min.js"></script>
+    
+        <!-- Load tracker.js and app.js-->
+        <script src="./js/app.js"></script>
+        <script src="./js/tracker.js"></script>
+        
+        <script src="./js/script.js"></script>
+        <script>
+    
+            let source = 'video'; // camera|video|stream		
+            let sourceVideo = '';
+            let defaultVideo = 'videos/1.mp4';
+            let defaultStream = 'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8';
+            let model = 'MoveNetSinglePoseLightning';
+            /*
+                ^^^ available pre-defined models:
+                    
+                    - MoveNetSinglePoseLightning				
+                    - MoveNetSinglePoseThunder
+                    - MoveNetMultiPoseLightning
+                    - PoseNetMobileNetV1
+                    - PoseNetResNet50
+                    - BlazePoseLite
+                    - BlazePoseHeavy
+                    - BlazePoseFull
+             */
+    
+            // initialize app
+            app.init();
+            
+            // initialize AI tracker model
+            tracker.setModel(model);
+            tracker.autofit = true; // enable auto resize/fit
+    
+            // set-up hooks
+            tracker.on('statuschange', function(msg) {
+                app.updateStatus(msg);
+            });
+            tracker.on('beforeupdate', function(poses) {
+                app.updateDebug(poses);
+                app.updateCounter(poses);
+            });
+    
+            // config		
+            tracker.elCanvas = '#canvas';
+            tracker.elVideo = '#video';
+            tracker.el3D = '#view_3d';
+            tracker.pointWidth = 6;
+            tracker.pointRadius = 8;
+    
+            // run predictions
+            tracker.run(source);
+        </script>
+    </body>
+</html>
