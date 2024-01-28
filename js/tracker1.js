@@ -1,7 +1,7 @@
 // Copyright Marcin "szczyglis" Szczyglinski, 2022. All Rights Reserved.
 // Email: szczyglis@protonmail.com
 // WWW: https://github.com/szczyglis-dev/js-ai-body-tracker
-// Library: tracker.js
+// Library: tracker1.js
 // Version: 1.0.0
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
@@ -609,13 +609,13 @@ const tracker1 = {
     run: function(source) {
         switch (source) {
             case 'video1':
-                tracker.initvideo1();
+                tracker1.initvideo1();
                 break;
             case 'camera':
-                tracker.initCamera();
+                tracker1.initCamera();
                 break;
             case 'stream':
-                tracker.initStream();
+                tracker1.initStream();
                 break;
         }
     },
@@ -624,11 +624,11 @@ const tracker1 = {
         Initialize ScatterGL
      */
     init3D: function() {
-        if (tracker.scatterGLEl == null) {
+        if (tracker1.scatterGLEl == null) {
             return;
         }
         // init and store instance
-        tracker.scatterGL = new ScatterGL(tracker.scatterGLEl, {
+        tracker1.scatterGL = new ScatterGL(tracker1.scatterGLEl, {
             'rotateOnStart': true,
             'selectEnabled': false,
             'styles': {
@@ -647,17 +647,17 @@ const tracker1 = {
         Initialize core elements
      */
     init: function() {
-        tracker.log('Initializing...');
+        tracker1.log('Initializing...');
 
         // init elements
-        tracker.video1 = document.querySelector(tracker.elvideo1);
-        tracker.canvas1 = document.querySelector(tracker.elcanvas1),
-            tracker.scatterGLEl = document.querySelector(tracker.el3D);
-        tracker.ctx = tracker.canvas1.getContext("2d");
+        tracker1.video1 = document.querySelector(tracker1.elvideo1);
+        tracker1.canvas1 = document.querySelector(tracker1.elcanvas1),
+            tracker1.scatterGLEl = document.querySelector(tracker1.el3D);
+        tracker1.ctx = tracker1.canvas1.getContext("2d");
 
         // instantiate ScatterGL for 3D points view (BlazePose model only)
-        if (tracker.detectorModel == poseDetection.SupportedModels.BlazePose) {
-            tracker.init3D();
+        if (tracker1.detectorModel == poseDetection.SupportedModels.BlazePose) {
+            tracker1.init3D();
         }
     },
 
@@ -665,44 +665,44 @@ const tracker1 = {
         Initialize video1 stream
      */
     initStream: function() {
-        tracker.init();
-        tracker.video1JS = video1js('video1'); // initialize video1.js
-        tracker.video1 = document.querySelector("video1#video1, #video1 video1");
+        tracker1.init();
+        tracker1.video1JS = video1js('video1'); // initialize video1.js
+        tracker1.video1 = document.querySelector("video1#video1, #video1 video1");
 
         // initial settings
-        tracker.video1.autoPlay = false;
-        tracker.video1.loop = false;
-        tracker.container = {
-            video1: tracker.video1,
+        tracker1.video1.autoPlay = false;
+        tracker1.video1.loop = false;
+        tracker1.container = {
+            video1: tracker1.video1,
             ready: false,
         };
 
         // setup video1 events
-        tracker.video1.addEventListener('playing', function() {
-            tracker.log('Event: playing');
-            tracker.isWaiting = false;
-            tracker.onStreamReady();
+        tracker1.video1.addEventListener('playing', function() {
+            tracker1.log('Event: playing');
+            tracker1.isWaiting = false;
+            tracker1.onStreamReady();
         }, false);
 
-        tracker.video1.addEventListener('play', function() {
-            tracker.log('Event: play');
+        tracker1.video1.addEventListener('play', function() {
+            tracker1.log('Event: play');
         }, false);
 
-        tracker.video1.addEventListener('loadedmetadata', function() {
-            tracker.log('Event: loadedmetadata');
-            tracker.container.ready = true;
-            tracker.showPlaybackControls();
+        tracker1.video1.addEventListener('loadedmetadata', function() {
+            tracker1.log('Event: loadedmetadata');
+            tracker1.container.ready = true;
+            tracker1.showPlaybackControls();
         }, false);
 
-        tracker.video1.addEventListener('error', function(e) {
+        tracker1.video1.addEventListener('error', function(e) {
             console.error(e);
-            tracker.dispatch('video1error', e);
-            tracker.setStatus('Error');
+            tracker1.dispatch('video1error', e);
+            tracker1.setStatus('Error');
         }, true);
 
         // setup play/pause event
-        tracker.canvas1.addEventListener("click", function() {
-            tracker.playPauseClick();
+        tracker1.canvas1.addEventListener("click", function() {
+            tracker1.playPauseClick();
         });
     },
 
@@ -710,68 +710,68 @@ const tracker1 = {
         Load video1 stream from source using video1JS
      */
     loadStream: function(src) {
-        tracker.log('Loading source: ' + src);
-        tracker.setStatus('Please wait...loading...');
+        tracker1.log('Loading source: ' + src);
+        tracker1.setStatus('Please wait...loading...');
 
         // cancel current frame update if present
-        if (tracker.reqID != null) {
-            window.cancelAnimationFrame(tracker.reqID);
+        if (tracker1.reqID != null) {
+            window.cancelAnimationFrame(tracker1.reqID);
         }
 
         // dispose current detector
-        if (tracker.detector != null) {
-            tracker.detector.dispose();
+        if (tracker1.detector != null) {
+            tracker1.detector.dispose();
         }
-        tracker.detector = null;
+        tracker1.detector = null;
 
         // pause, switch source and play new
-        tracker.video1.pause();
-        tracker.video1JS.src({
+        tracker1.video1.pause();
+        tracker1.video1JS.src({
             src: src,
             type: 'application/x-mpegURL'
         });
-        tracker.container = {
-            video1: tracker.video1,
+        tracker1.container = {
+            video1: tracker1.video1,
             ready: true,
         };
-        tracker.video1JS.play();
+        tracker1.video1JS.play();
     },
 
     /*
         Handle stream
      */
     handleStream: async function() {
-        tracker.log('Handling stream...');
-        tracker.onStreamReady();
+        tracker1.log('Handling stream...');
+        tracker1.onStreamReady();
     },
 
     /*
         Launch video1 stream when ready
      */
     onStreamReady: async function(e) {
-        tracker.log('On Stream ready');
+        tracker1.log('On Stream ready');
 
         // create detector
-        if (tracker.detector == null) {
-            tracker.detector = await poseDetection.createDetector(
-                tracker.detectorModel,
-                tracker.detectorConfig
+        if (tracker1.detector == null) {
+            tracker1.detector = await poseDetection.createDetector(
+                tracker1.detectorModel,
+                tracker1.detectorConfig
             );
         }
 
         // set dimensions
-        tracker.video1.width = tracker.container.video1.video1Width;
-        tracker.video1.height = tracker.container.video1.video1Height;
-        tracker.canvas1.width = tracker.container.video1.video1Width;
-        tracker.canvas1.height = tracker.container.video1.video1Height;
+        tracker1.video1.width = tracker1.container.video1.video1Width;
+        tracker1.video1.height = tracker1.container.video1.video1Height;
+        tracker1.canvas1.width = tracker1.container.video1.video1Width;
+        tracker1.canvas1.height = tracker1.container.video1.video1Height;
 
         // cancel current frame update if present
-        if (tracker.reqID != null) {
-            window.cancelAnimationFrame(tracker.reqID);
+        if (tracker1.reqID != null) {
+            window.cancelAnimationFrame(tracker1.reqID);
         }
 
         // init frame update
-        tracker.reqID = window.requestAnimationFrame(tracker.video1Frame);
+        tracker1.reqID = window.requestAnimationFrame(tracker1.video1Frame);
     },
 
     /*
@@ -779,46 +779,46 @@ const tracker1 = {
      */
     initvideo1: async function() {
         // initialize
-        tracker.init();
+        tracker1.init();
 
         // setup video1
-        tracker.video1.autoPlay = true;
-        tracker.video1.loop = false;
-        tracker.container = {
-            video1: tracker.video1,
+        tracker1.video1.autoPlay = true;
+        tracker1.video1.loop = false;
+        tracker1.container = {
+            video1: tracker1.video1,
             ready: true,
         };
 
         // setup video1 events
-        tracker.video1.addEventListener('loadedmetadata', function() {
-            tracker.log('Event: loadedmetadata');
-            tracker.container.ready = true;
-            tracker.showPlaybackControls();
+        tracker1.video1.addEventListener('loadedmetadata', function() {
+            tracker1.log('Event: loadedmetadata');
+            tracker1.container.ready = true;
+            tracker1.showPlaybackControls();
             //this.currentTime = 210; // optional - set video1 start time
         }, false);
 
-        tracker.video1.addEventListener('playing', function() {
-            tracker.log('Event: playing');
-            tracker.isWaiting = false;
-            if (!tracker.isPlaying) {
-                tracker.onvideo1Ready();
-                tracker.isPlaying = true;
+        tracker1.video1.addEventListener('playing', function() {
+            tracker1.log('Event: playing');
+            tracker1.isWaiting = false;
+            if (!tracker1.isPlaying) {
+                tracker1.onvideo1Ready();
+                tracker1.isPlaying = true;
             }
         }, false);
 
-        tracker.video1.addEventListener('play', function() {
-            tracker.log('Event: play');
+        tracker1.video1.addEventListener('play', function() {
+            tracker1.log('Event: play');
         }, false);
 
-        tracker.video1.addEventListener('error', function(e) {
+        tracker1.video1.addEventListener('error', function(e) {
             console.error(e);
-            tracker.dispatch('video1error', e);
-            tracker.setStatus('Error');
+            tracker1.dispatch('video1error', e);
+            tracker1.setStatus('Error');
         }, true);
 
         // setup play/pause click event
-        tracker.canvas1.addEventListener("click", function() {
-            tracker.playPauseClick();
+        tracker1.canvas1.addEventListener("click", function() {
+            tracker1.playPauseClick();
         });
     },
 
@@ -826,58 +826,58 @@ const tracker1 = {
         Launch video1 when ready
      */
     onvideo1Ready: async function(e) {
-        tracker.log('On video1 ready');
+        tracker1.log('On video1 ready');
 
         // cancel current frame update if present
-        if (tracker.reqID != null) {
-            window.cancelAnimationFrame(tracker.reqID);
+        if (tracker1.reqID != null) {
+            window.cancelAnimationFrame(tracker1.reqID);
         }
 
         // create detector
-        tracker.detector = await poseDetection.createDetector(
-            tracker.detectorModel,
-            tracker.detectorConfig
+        tracker1.detector = await poseDetection.createDetector(
+            tracker1.detectorModel,
+            tracker1.detectorConfig
         );
 
         // set dimensions
-        tracker.video1.width = tracker.container.video1.video1Width;
-        tracker.video1.height = tracker.container.video1.video1Height;
-        tracker.canvas1.width = tracker.container.video1.video1Width;
-        tracker.canvas1.height = tracker.container.video1.video1Height;
-        tracker.container.ready = true;
+        tracker1.video1.width = tracker1.container.video1.video1Width;
+        tracker1.video1.height = tracker1.container.video1.video1Height;
+        tracker1.canvas1.width = tracker1.container.video1.video1Width;
+        tracker1.canvas1.height = tracker1.container.video1.video1Height;
+        tracker1.container.ready = true;
 
         // init frame update
-        tracker.reqID = window.requestAnimationFrame(tracker.video1Frame);
+        tracker1.reqID = window.requestAnimationFrame(tracker1.video1Frame);
     },
 
     /*
         Load video1 from source address
      */
     loadvideo1: function(src) {
-        tracker.log('Loading source: ' + src);
-        tracker.setStatus('Please wait...loading...');
+        tracker1.log('Loading source: ' + src);
+        tracker1.setStatus('Please wait...loading...');
 
-        tracker.isPlaying = false; // allow new initialization
+        tracker1.isPlaying = false; // allow new initialization
 
         // cancel current frame update if present
-        if (tracker.reqID != null) {
-            window.cancelAnimationFrame(tracker.reqID);
+        if (tracker1.reqID != null) {
+            window.cancelAnimationFrame(tracker1.reqID);
         }
 
         // dispose current detector
-        if (tracker.detector != null) {
-            tracker.detector.dispose();
+        if (tracker1.detector != null) {
+            tracker1.detector.dispose();
         }
-        tracker.detector = null;
+        tracker1.detector = null;
 
         // pause, change source and play new
-        tracker.video1.pause();
-        tracker.video1.src = src;
-        tracker.container = {
-            video1: tracker.video1,
+        tracker1.video1.pause();
+        tracker1.video1.src = src;
+        tracker1.container = {
+            video1: tracker1.video1,
             ready: true,
         };
-        tracker.video1.play();
+        tracker1.video1.play();
     },
 
     /*
@@ -885,71 +885,71 @@ const tracker1 = {
      */
     video1Frame: async function() {
 
-        tracker.setStatus('');
+        tracker1.setStatus('');
 
         // check if video1 is ready
-        if (tracker.container !== undefined && tracker.container.ready) {
-            if (tracker.enableAI && tracker.container.video1 != null) {
+        if (tracker1.container !== undefined && tracker1.container.ready) {
+            if (tracker1.enableAI && tracker1.container.video1 != null) {
                 // try to detect poses
                 try {
                     const estimationConfig = {
                         flipHorizontal: false
                     };
                     const timestamp = performance.now();
-                    tracker.poses = await tracker.detector.estimatePoses(tracker.container.video1, 
+                    tracker1.poses = await tracker1.detector.estimatePoses(tracker1.container.video1, 
                         estimationConfig, timestamp);
                 } catch (err) {
-                    tracker.dispatch('detectorerror', err);
+                    tracker1.dispatch('detectorerror', err);
                     console.error(err);
                 }
             }
 
             // clear canvas1
-            tracker.clearcanvas1();
+            tracker1.clearcanvas1();
 
             // draw video1 frame on canvas1
-            if (tracker.enablevideo1) {
-                tracker.ctx.drawImage(tracker.container.video1,
+            if (tracker1.enablevideo1) {
+                tracker1.ctx.drawImage(tracker1.container.video1,
                     0,
                     0,
-                    tracker.container.video1.video1Width,
-                    tracker.container.video1.video1Height);
+                    tracker1.container.video1.video1Width,
+                    tracker1.container.video1.video1Height);
             }
 
             // handle detected poses
-            if (tracker.enableAI) {
-                tracker.handlePoses();
+            if (tracker1.enableAI) {
+                tracker1.handlePoses();
             }
 
             // if video1 is paused then show controls
-            if (tracker.container.video1.paused) {
-                tracker.showPlaybackControls();
+            if (tracker1.container.video1.paused) {
+                tracker1.showPlaybackControls();
             }
         }
 
         // next frame
-        tracker.reqID = window.requestAnimationFrame(tracker.video1Frame);
+        tracker1.reqID = window.requestAnimationFrame(tracker1.video1Frame);
     },
 
     /*
         Initialize camera
      */
     initCamera: async function() {
-        tracker.init();
+        tracker1.init();
 
         // init detectot
-        tracker.detector = await poseDetection.createDetector(
-            tracker.detectorModel,
-            tracker.detectorConfig
+        tracker1.detector = await poseDetection.createDetector(
+            tracker1.detectorModel,
+            tracker1.detectorConfig
         );
 
         // init camera
         try {
-            tracker.video1 = await tracker.setupCamera();
-            tracker.video1.play();
-            tracker.cameraFrame();
+            tracker1.video1 = await tracker1.setupCamera();
+            tracker1.video1.play();
+            tracker1.cameraFrame();
         } catch (e) {
-            tracker.dispatch('video1error', e);
+            tracker1.dispatch('video1error', e);
             console.error(e);
         }
     },
@@ -958,7 +958,7 @@ const tracker1 = {
         Set-up camera
      */
     setupCamera: async function() {
-        tracker.setStatus('Please wait...initializing camera...');
+        tracker1.setStatus('Please wait...initializing camera...');
         // init device
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             throw new Error(
@@ -976,7 +976,7 @@ const tracker1 = {
                 },
             },
         });
-        tracker.video1.srcObject = stream; // attach camera stream to video1
+        tracker1.video1.srcObject = stream; // attach camera stream to video1
 
         // get width and height of the camera video1 stream
         let stream_settings = stream.getvideo1Tracks()[0].getSettings();
@@ -984,11 +984,11 @@ const tracker1 = {
         let stream_height = stream_settings.height;
 
         // re-init width and height with info from stream
-        tracker.video1.width = stream_width;
-        tracker.video1.height = stream_height;
+        tracker1.video1.width = stream_width;
+        tracker1.video1.height = stream_height;
 
         return new Promise((resolve) => {
-            tracker.video1.onloadedmetadata = () => resolve(video1);
+            tracker1.video1.onloadedmetadata = () => resolve(video1);
         });
     },
 
@@ -996,43 +996,43 @@ const tracker1 = {
         Render camera frame
      */
     cameraFrame: async function() {
-        tracker.setStatus('');
+        tracker1.setStatus('');
 
         // predict poses
-        tracker.poses = await tracker.detector.estimatePoses(tracker.video1);
+        tracker1.poses = await tracker1.detector.estimatePoses(tracker1.video1);
 
         // setup dimensions
-        tracker.canvas1.width = tracker.canvas1.scrollWidth;
-        tracker.canvas1.height = tracker.canvas1.scrollHeight;
-        if (tracker.video1.readyState === tracker.video1.HAVE_ENOUGH_DATA) {
+        tracker1.canvas1.width = tracker1.canvas1.scrollWidth;
+        tracker1.canvas1.height = tracker1.canvas1.scrollHeight;
+        if (tracker1.video1.readyState === tracker1.video1.HAVE_ENOUGH_DATA) {
             let xOffset = 0;
             const video1Size = {
-                width: tracker.video1.video1Width,
-                height: tracker.video1.video1Height
+                width: tracker1.video1.video1Width,
+                height: tracker1.video1.video1Height
             };
             const canvas1Size = {
-                width: tracker.canvas1.width,
-                height: tracker.canvas1.height
+                width: tracker1.canvas1.width,
+                height: tracker1.canvas1.height
             };
-            const renderSize = tracker.calculateSize(video1Size, canvas1Size);
+            const renderSize = tracker1.calculateSize(video1Size, canvas1Size);
             xOffset = (canvas1Size.width - renderSize.width) / 2;
 
             // clear canvas1
-            tracker.clearcanvas1();
+            tracker1.clearcanvas1();
 
             // draw video1 frame from camera on canvas1
-            if (tracker.enablevideo1) {
-                tracker.ctx.drawImage(tracker.video1, xOffset, 0, renderSize.width, renderSize.height);
+            if (tracker1.enablevideo1) {
+                tracker1.ctx.drawImage(tracker1.video1, xOffset, 0, renderSize.width, renderSize.height);
             }
         }
 
         // handle poses
-        if (tracker.enableAI) {
-            tracker.handlePoses();
+        if (tracker1.enableAI) {
+            tracker1.handlePoses();
         }
 
         // next frame
-        tracker.reqID = window.requestAnimationFrame(tracker.cameraFrame);
+        tracker1.reqID = window.requestAnimationFrame(tracker1.cameraFrame);
     },
 
     /*
@@ -1050,7 +1050,7 @@ const tracker1 = {
         Find and return pose keypoint coordinate (X or Y) by keypoint's name
      */
     findPosePoint: function(axis, name, pose) {
-        const kp = tracker.findKeypoint(name, pose);
+        const kp = tracker1.findKeypoint(name, pose);
         return kp[axis];
     },
 
@@ -1060,12 +1060,12 @@ const tracker1 = {
     getCoord: function(axis, points, pose) {
         // if only one point then return coordinate for this one
         if (points.length == 1) {
-            return tracker.findPosePoint(axis, points[0], pose);
+            return tracker1.findPosePoint(axis, points[0], pose);
         } else {
             // if multiple points then calculate coordinate between them
             let sum = 0.0;
             for (const el of points) {
-                sum += tracker.findPosePoint(axis, el, pose);
+                sum += tracker1.findPosePoint(axis, el, pose);
             }
             return sum / points.length;
         }
@@ -1076,10 +1076,10 @@ const tracker1 = {
      */
     getCoords: function(path, pose) {
         return {
-            'from_x': tracker.getCoord('x', path.from_x, pose),
-            'from_y': tracker.getCoord('y', path.from_y, pose),
-            'to_x': tracker.getCoord('x', path.to_x, pose),
-            'to_y': tracker.getCoord('y', path.to_y, pose),
+            'from_x': tracker1.getCoord('x', path.from_x, pose),
+            'from_y': tracker1.getCoord('y', path.from_y, pose),
+            'to_x': tracker1.getCoord('x', path.to_x, pose),
+            'to_y': tracker1.getCoord('y', path.to_y, pose),
         };
     },
 
@@ -1089,12 +1089,12 @@ const tracker1 = {
     getScore: function(path, pose) {
         // if only one point then check score for this one
         if (path.scores.length == 1) {
-            return tracker.findKeypoint(path.scores[0], pose).score;
+            return tracker1.findKeypoint(path.scores[0], pose).score;
         } else {
             // if multiple points then check score for all
             let sum = 0.0;
             for (const el of path.scores) {
-                sum += tracker.findKeypoint(el, pose).score;
+                sum += tracker1.findKeypoint(el, pose).score;
             }
             return sum / path.scores.length;
         }
@@ -1107,13 +1107,13 @@ const tracker1 = {
         let res = true;
         // if only one point then check score for this one
         if (path.scores.length == 1) {
-            if (tracker.findKeypoint(path.scores[0], pose).score < tracker.minScore) {
+            if (tracker1.findKeypoint(path.scores[0], pose).score < tracker1.minScore) {
                 res = false;
             }
         } else {
             // if multiple points then check score for all
             for (const el of path.scores) {
-                if (tracker.findKeypoint(el, pose).score < tracker.minScore) {
+                if (tracker1.findKeypoint(el, pose).score < tracker1.minScore) {
                     res = false;
                     break;
                 }
@@ -1146,18 +1146,18 @@ const tracker1 = {
      */
     scaleX: function(x) {
         const video1Size = {
-            width: tracker.video1.video1Width,
-            height: tracker.video1.video1Height
+            width: tracker1.video1.video1Width,
+            height: tracker1.video1.video1Height
         };
         const canvas1Size = {
-            width: tracker.canvas1.width,
-            height: tracker.canvas1.height
+            width: tracker1.canvas1.width,
+            height: tracker1.canvas1.height
         };
-        const renderSize = tracker.calculateSize(video1Size, canvas1Size);
+        const renderSize = tracker1.calculateSize(video1Size, canvas1Size);
         let xOffset = (canvas1Size.width - renderSize.width) / 2;
         const factor = (renderSize.width) / video1Size.width;
 
-        if (!tracker.autofit) {
+        if (!tracker1.autofit) {
             xOffset = 0;
         }
 
@@ -1169,18 +1169,18 @@ const tracker1 = {
      */
     scaleY: function(y) {
         const video1Size = {
-            width: tracker.video1.video1Width,
-            height: tracker.video1.video1Height
+            width: tracker1.video1.video1Width,
+            height: tracker1.video1.video1Height
         };
         const canvas1Size = {
-            width: tracker.canvas1.width,
-            height: tracker.canvas1.height
+            width: tracker1.canvas1.width,
+            height: tracker1.canvas1.height
         };
-        const renderSize = tracker.calculateSize(video1Size, canvas1Size);
+        const renderSize = tracker1.calculateSize(video1Size, canvas1Size);
         let yOffset = (canvas1Size.height - renderSize.height) / 2;
 
         // if vertical then cancel offset
-        if (window.innerHeight > window.innerWidth || !tracker.autofit) {
+        if (window.innerHeight > window.innerWidth || !tracker1.autofit) {
             yOffset = 0;
         }
 
@@ -1193,26 +1193,26 @@ const tracker1 = {
      */
     handlePoses: function() {
         // run user defined hooks
-        tracker.dispatch('beforeupdate', tracker.poses);
+        tracker1.dispatch('beforeupdate', tracker1.poses);
 
-        if (tracker.poses && tracker.poses.length > 0) {
+        if (tracker1.poses && tracker1.poses.length > 0) {
             let pathlist;
 
             // get corrent pathlist for specified neural net
-            switch (tracker.detectorModel) {
+            switch (tracker1.detectorModel) {
                 case poseDetection.SupportedModels.MoveNet:
                 case poseDetection.SupportedModels.PoseNet:
-                    pathlist = tracker.paths['movenet_posenet'];
+                    pathlist = tracker1.paths['movenet_posenet'];
                     break;
                 case poseDetection.SupportedModels.BlazePose:
-                    pathlist = tracker.paths['blaze_pose'];
+                    pathlist = tracker1.paths['blaze_pose'];
                     break;
             }
 
             let point, score;
 
             // loop on all finded poses
-            for (let pose of tracker.poses) {
+            for (let pose of tracker1.poses) {
 
                 // loop on pathslist
                 for (let k in pathlist) {
@@ -1220,14 +1220,14 @@ const tracker1 = {
                     if (pathlist.hasOwnProperty(k)) {
                         
                         // if there is no required threeshold (score) then next
-                        if (!tracker.hasScore(pathlist[k], pose)) {
+                        if (!tracker1.hasScore(pathlist[k], pose)) {
                             continue;
                         }
-                        point = tracker.getCoords(pathlist[k], pose); // get X,Y coords of path
-                        score = tracker.getScore(pathlist[k], pose); // calculate score for path
+                        point = tracker1.getCoords(pathlist[k], pose); // get X,Y coords of path
+                        score = tracker1.getScore(pathlist[k], pose); // calculate score for path
 
                         // draw path on canvas1
-                        tracker.drawPath(point.from_x,
+                        tracker1.drawPath(point.from_x,
                             point.from_y,
                             point.to_x,
                             point.to_y,
@@ -1239,14 +1239,14 @@ const tracker1 = {
                 }
 
                 // draw 3D points if available using ScatterGL
-                if (tracker.enable3D && pose.keypoints3D != null && pose.keypoints3D.length > 0) {
-                    tracker.drawKeypoints3D(pose.keypoints3D);
+                if (tracker1.enable3D && pose.keypoints3D != null && pose.keypoints3D.length > 0) {
+                    tracker1.drawKeypoints3D(pose.keypoints3D);
                 }
             }
         }
 
         // run user defined hooks
-        tracker.dispatch('afterupdate', tracker.poses);
+        tracker1.dispatch('afterupdate', tracker1.poses);
     },
 
     /*
@@ -1259,12 +1259,12 @@ const tracker1 = {
             a = 0.0;
         }
         // draw connection
-        tracker.drawLine(tracker.scaleX(fromX), tracker.scaleY(fromY), 
-            tracker.scaleX(toX), tracker.scaleY(toY), 
+        tracker1.drawLine(tracker1.scaleX(fromX), tracker1.scaleY(fromY), 
+            tracker1.scaleX(toX), tracker1.scaleY(toY), 
             r, g, b, a);
 
         // draw joint
-        tracker.drawCircle(tracker.scaleX(fromX), tracker.scaleY(fromY), 
+        tracker1.drawCircle(tracker1.scaleX(fromX), tracker1.scaleY(fromY), 
             r, g, b, a);
     },
 
@@ -1272,37 +1272,37 @@ const tracker1 = {
         Draw connection between points on canvas1
      */
     drawLine: function(fromX, fromY, toX, toY, r, g, b, a) {
-        tracker.ctx.beginPath();
-        tracker.ctx.lineWidth = tracker.pointWidth;
-        tracker.ctx.strokeStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
-        tracker.ctx.moveTo(fromX, fromY);
-        tracker.ctx.lineTo(toX, toY);
-        tracker.ctx.stroke();
-        tracker.ctx.closePath();
+        tracker1.ctx.beginPath();
+        tracker1.ctx.lineWidth = tracker1.pointWidth;
+        tracker1.ctx.strokeStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+        tracker1.ctx.moveTo(fromX, fromY);
+        tracker1.ctx.lineTo(toX, toY);
+        tracker1.ctx.stroke();
+        tracker1.ctx.closePath();
     },
 
     /*
         Draw point on canvas1
      */
     drawCircle: function(fromX, fromY, r, g, b, a) {
-        tracker.ctx.beginPath();
-        tracker.ctx.arc(fromX, fromY, tracker.pointRadius, 0, 2 * Math.PI);
-        tracker.ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
-        tracker.ctx.fill();
-        tracker.ctx.closePath();
+        tracker1.ctx.beginPath();
+        tracker1.ctx.arc(fromX, fromY, tracker1.pointRadius, 0, 2 * Math.PI);
+        tracker1.ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+        tracker1.ctx.fill();
+        tracker1.ctx.closePath();
     },
 
     /*
         Draw 3D keypoints using ScatterGL
      */
     drawKeypoints3D: function(keypoints) {
-        const scoreThreshold = tracker.minScore || 0;
+        const scoreThreshold = tracker1.minScore || 0;
         const pointsData = keypoints.map(keypoint => [keypoint.x, -keypoint.y, -keypoint.z]);
-        const dataset = new ScatterGL.Dataset([...pointsData, ...tracker.anchors3D]);
-        const keypointInd = poseDetection.util.getKeypointIndexBySide(tracker.detectorModel);
+        const dataset = new ScatterGL.Dataset([...pointsData, ...tracker1.anchors3D]);
+        const keypointInd = poseDetection.util.getKeypointIndexBySide(tracker1.detectorModel);
 
         // defined colors for sizes
-        tracker.scatterGL.setPointColorer(i => {
+        tracker1.scatterGL.setPointColorer(i => {
             if (keypoints[i] == null || keypoints[i].score < scoreThreshold) {
                 return '#ffffff'; // white if low score
             }
@@ -1318,66 +1318,66 @@ const tracker1 = {
         });
 
         // check if already rendered
-        if (!tracker.scatterGLInitialized) {
-            tracker.scatterGL.render(dataset);
+        if (!tracker1.scatterGLInitialized) {
+            tracker1.scatterGL.render(dataset);
         } else {
-            tracker.scatterGL.updateDataset(dataset);
+            tracker1.scatterGL.updateDataset(dataset);
         }
 
-        const connections = poseDetection.util.getAdjacentPairs(tracker.detectorModel);
+        const connections = poseDetection.util.getAdjacentPairs(tracker1.detectorModel);
         const sequences = connections.map(pair => ({
             indices: pair
         }));
-        tracker.scatterGL.setSequences(sequences);
-        tracker.scatterGLInitialized = true;
+        tracker1.scatterGL.setSequences(sequences);
+        tracker1.scatterGLInitialized = true;
     },
 
     /*
         Clear canvas1 area
      */
     clearcanvas1: function() {
-        tracker.ctx.save();
-        tracker.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        tracker.ctx.clearRect(0, 0, tracker.canvas1.width, tracker.canvas1.height);
-        tracker.ctx.restore();
+        tracker1.ctx.save();
+        tracker1.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        tracker1.ctx.clearRect(0, 0, tracker1.canvas1.width, tracker1.canvas1.height);
+        tracker1.ctx.restore();
     },
 
     /*
         Display play/pause icon
      */
     showPlaybackControls: function() {
-        let size = (tracker.canvas1.height / 2) * 0.5;
+        let size = (tracker1.canvas1.height / 2) * 0.5;
 
-        tracker.ctx.fillStyle = "black";
-        tracker.ctx.globalAlpha = 0.5;
-        tracker.ctx.fillRect(0, 0, tracker.canvas1.width, tracker.canvas1.height);
-        tracker.ctx.fillStyle = "#DDD";
-        tracker.ctx.globalAlpha = 0.75;
-        tracker.ctx.beginPath();
-        tracker.ctx.moveTo(tracker.canvas1.width / 2 + size / 2, tracker.canvas1.height / 2);
-        tracker.ctx.lineTo(tracker.canvas1.width / 2 - size / 2, tracker.canvas1.height / 2 + size);
-        tracker.ctx.lineTo(tracker.canvas1.width / 2 - size / 2, tracker.canvas1.height / 2 - size);
-        tracker.ctx.closePath();
-        tracker.ctx.fill();
-        tracker.ctx.globalAlpha = 1;
+        tracker1.ctx.fillStyle = "black";
+        tracker1.ctx.globalAlpha = 0.5;
+        tracker1.ctx.fillRect(0, 0, tracker1.canvas1.width, tracker1.canvas1.height);
+        tracker1.ctx.fillStyle = "#DDD";
+        tracker1.ctx.globalAlpha = 0.75;
+        tracker1.ctx.beginPath();
+        tracker1.ctx.moveTo(tracker1.canvas1.width / 2 + size / 2, tracker1.canvas1.height / 2);
+        tracker1.ctx.lineTo(tracker1.canvas1.width / 2 - size / 2, tracker1.canvas1.height / 2 + size);
+        tracker1.ctx.lineTo(tracker1.canvas1.width / 2 - size / 2, tracker1.canvas1.height / 2 - size);
+        tracker1.ctx.closePath();
+        tracker1.ctx.fill();
+        tracker1.ctx.globalAlpha = 1;
     },
 
     /*
         Handle play/pause click on video1
      */
     playPauseClick: function() {
-        if (tracker.container !== undefined && tracker.container.ready) {
-            if (tracker.container.video1.paused) {
-                tracker.log('click: Play');
-                tracker.play();
-                tracker.isWaiting = true;
-                tracker.setStatus('Please wait...');
+        if (tracker1.container !== undefined && tracker1.container.ready) {
+            if (tracker1.container.video1.paused) {
+                tracker1.log('click: Play');
+                tracker1.play();
+                tracker1.isWaiting = true;
+                tracker1.setStatus('Please wait...');
             } else {
                 // abort if waiting for playing
-                if (!tracker.isWaiting) {
-                    tracker.log('click: Pause');
-                    tracker.pause();
-                    tracker.setStatus('Paused.');
+                if (!tracker1.isWaiting) {
+                    tracker1.log('click: Pause');
+                    tracker1.pause();
+                    tracker1.setStatus('Paused.');
                 }
             }
         }
@@ -1387,21 +1387,21 @@ const tracker1 = {
         Play video1
      */
     play: function() {
-        tracker.container.video1.play();
+        tracker1.container.video1.play();
     },
 
     /*
         Pause video1
      */
     pause: function() {
-        tracker.container.video1.pause();
+        tracker1.container.video1.pause();
     },
 
     /*
         Log message
      */
     log: function(...args) {
-        if (tracker.log) {
+        if (tracker1.log) {
             console.log(...args);
         }
     },
@@ -1410,28 +1410,28 @@ const tracker1 = {
         Set status message
      */
     setStatus: function(msg) {
-        tracker.status = msg;
-        tracker.dispatch('statuschange', tracker.status);
+        tracker1.status = msg;
+        tracker1.dispatch('statuschange', tracker1.status);
     },
 
     /*
         Append external hook/event
      */
     on: function(name, hook) {
-        if (typeof tracker.hooks[name] === 'undefined') {
+        if (typeof tracker1.hooks[name] === 'undefined') {
             return;
         }
-        tracker.hooks[name].push(hook);
+        tracker1.hooks[name].push(hook);
     },
 
     /*
         Dispatch hook/event
      */
     dispatch: function(name, event) {
-        if (typeof tracker.hooks[name] === 'undefined') {
+        if (typeof tracker1.hooks[name] === 'undefined') {
             return;
         }
-        for (const hook of tracker.hooks[name]) {
+        for (const hook of tracker1.hooks[name]) {
             hook(event);
         }
     },
@@ -1442,74 +1442,74 @@ const tracker1 = {
     setModel: function(model) {
         switch (model) {
             case 'BlazePoseLite':
-                tracker.detectorModel = poseDetection.SupportedModels.BlazePose;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.BlazePose;
+                tracker1.detectorConfig = {
                     runtime: 'tfjs',
                     enableSmoothing: true,
                     modelType: 'lite'
                 };
-                tracker.minScore = 0.65;
+                tracker1.minScore = 0.65;
                 break;
 
             case 'BlazePoseHeavy':
-                tracker.detectorModel = poseDetection.SupportedModels.BlazePose;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.BlazePose;
+                tracker1.detectorConfig = {
                     runtime: 'tfjs',
                     enableSmoothing: true,
                     modelType: 'heavy'
                 };
-                tracker.minScore = 0.65;
+                tracker1.minScore = 0.65;
                 break;
 
             case 'BlazePoseFull':
-                tracker.detectorModel = poseDetection.SupportedModels.BlazePose;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.BlazePose;
+                tracker1.detectorConfig = {
                     runtime: 'tfjs',
                     enableSmoothing: true,
                     modelType: 'full'
                 };
-                tracker.minScore = 0.65;
+                tracker1.minScore = 0.65;
                 break;
 
             case 'MoveNetSinglePoseLightning':
-                tracker.detectorModel = poseDetection.SupportedModels.MoveNet;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.MoveNet;
+                tracker1.detectorConfig = {
                     modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
                     enableSmoothing: true,
                     multiPoseMaxDimension: 256,
                     enableTracking: true,
                     trackerType: poseDetection.TrackerType.BoundingBox
                 }
-                tracker.minScore = 0.35;
+                tracker1.minScore = 0.35;
                 break;
 
             case 'MoveNetMultiPoseLightning':
-                tracker.detectorModel = poseDetection.SupportedModels.MoveNet;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.MoveNet;
+                tracker1.detectorConfig = {
                     modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING,
                     enableSmoothing: true,
                     multiPoseMaxDimension: 256,
                     enableTracking: true,
                     trackerType: poseDetection.TrackerType.BoundingBox
                 }
-                tracker.minScore = 0.35;
+                tracker1.minScore = 0.35;
                 break;
 
             case 'MoveNetSinglePoseThunder':
-                tracker.detectorModel = poseDetection.SupportedModels.MoveNet;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.MoveNet;
+                tracker1.detectorConfig = {
                     modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
                     enableSmoothing: true,
                     multiPoseMaxDimension: 256,
                     enableTracking: true,
                     trackerType: poseDetection.TrackerType.BoundingBox
                 }
-                tracker.minScore = 0.35;
+                tracker1.minScore = 0.35;
                 break;
 
             case 'PoseNetMobileNetV1':
-                tracker.detectorModel = poseDetection.SupportedModels.PoseNet;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.PoseNet;
+                tracker1.detectorConfig = {
                     architecture: 'MobileNetV1',
                     outputStride: 16,
                     inputResolution: {
@@ -1518,12 +1518,12 @@ const tracker1 = {
                     },
                     multiplier: 0.75
                 }
-                tracker.minScore = 0.5;
+                tracker1.minScore = 0.5;
                 break;
 
             case 'PoseNetResNet50':
-                tracker.detectorModel = poseDetection.SupportedModels.PoseNet;
-                tracker.detectorConfig = {
+                tracker1.detectorModel = poseDetection.SupportedModels.PoseNet;
+                tracker1.detectorConfig = {
                     architecture: 'ResNet50',
                     outputStride: 16,
                     multiplier: 1.0,
@@ -1533,7 +1533,7 @@ const tracker1 = {
                     },
                     quantBytes: 2
                 }
-                tracker.minScore = 0.5;
+                tracker1.minScore = 0.5;
                 break;
         }
     },
