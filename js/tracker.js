@@ -671,7 +671,7 @@ const tracker = {
 
         // initial settings
         tracker.video.autoPlay = false;
-        tracker.video.loop = true;
+        tracker.video.loop = false;
         tracker.container = {
             video: tracker.video,
             ready: false,
@@ -783,7 +783,7 @@ const tracker = {
 
         // setup video
         tracker.video.autoPlay = true;
-        tracker.video.loop = true;
+        tracker.video.loop = false;
         tracker.container = {
             video: tracker.video,
             ready: true,
