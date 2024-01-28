@@ -6,7 +6,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-const tracker = {
+const tracker1 = {
     // config options
     detectorModel: poseDetection.SupportedModels.MoveNet, // detector model
     detectorConfig: { // detector configuration
